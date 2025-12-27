@@ -1,0 +1,5 @@
+
+Make first caching download from the OWASP cheat sheet site https://cheatsheetseries.owasp.org/bundle.zip
+
+Ensure to store "Last Updated" with the locally cached files
+Update cached html that doesnt match with last Updated
