@@ -14,6 +14,7 @@ linkToParse = "https://cheatsheetseries.owasp.org/News.xml"
 
 parsed = feedparser.parse(linkToParse)
 
+    
 def deepRemove(Path):
     # Recursive function that will go through a folder and remove all contents
     if os.path.isdir(Path):
@@ -65,6 +66,12 @@ def freshDownload(): # Use this for a fresh install/Complete refesh of data
     # Remove temp zip
     os.remove("temp/owaspDelete.zip")
 
+    # Next
+    # Go through all the files created and strip them to "barebones"
+    # Essentially just grab data-md-component="content" from the HTML
+    # Then convert it to markdown?
+    # ^ or just do .get_text() for it
+
 
 def checkForUpdates():
     # Check the "last updated" compared to the files last modified for the page for each
@@ -72,4 +79,3 @@ def checkForUpdates():
     # Download the data from the provided link
     print("Not meant to run yet")
 
-freshDownload()
