@@ -1,4 +1,21 @@
 
+-------COMPLETED------------
+Download data from OWASP cheat sheet
+
+---------TO DO--------------
+Properly ingest the downloaded data
+    | Normalise the text
+    | Chunk the data into segments that will fit with our tokens
+Call our embedding model, in this case all-MiniLM-L6-v2
+Store in Chroma 
+Call our LLM model In this case chatgroq
+Create our query, context and system messages
+Take input from user
+Call the AI
+Print the response
+
+
+----------------------------
 Make first caching download from the OWASP cheat sheet site https://cheatsheetseries.owasp.org/bundle.zip
 
 Ensure to store "Last Updated" with the locally cached files
@@ -13,3 +30,14 @@ data-md-component="content"
 Below gets the main text from the OWASP documents
     soup = BeautifulSoup(file,'html.parser')
         print(soup.find("div", {"class": "md-content"}).get_text())
+
+
+Look into converting HTML into markdown to preserve some layout
+
+Look into sliding window chunking to preserve context across segments
+Look into using recursive chunking with each page being the main bit
+^ https://blog.holoviz.org/posts/fleet_ai/ This has context like i want... Nothing about how the data is parsed though
+
+Potentially allow for a local version and an online version
+
+
