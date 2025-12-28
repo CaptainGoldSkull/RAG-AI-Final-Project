@@ -65,6 +65,10 @@ def freshDownload(): # Use this for a fresh install/Complete refesh of data
     # Remove temp zip
     os.remove("temp/owaspDelete.zip")
 
+    with open('cachedPages/owasp/site/cheatsheets/Abuse_Case_Cheat_Sheet.html') as file:
+        soup = BeautifulSoup(file,'html.parser')
+        
+        print(soup.find_all("div", {"class": "md-content"}))
 
 def checkForUpdates():
     # Check the "last updated" compared to the files last modified for the page for each
