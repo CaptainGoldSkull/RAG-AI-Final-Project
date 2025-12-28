@@ -3,3 +3,9 @@ Make first caching download from the OWASP cheat sheet site https://cheatsheetse
 
 Ensure to store "Last Updated" with the locally cached files
 Update cached html that doesnt match with last Updated
+
+
+Figure out a way to chunk the data based on the pages 
+
+THE PAGE DATA IS STORED UNDER:
+data-md-component="content"
