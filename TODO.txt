@@ -10,3 +10,6 @@ Figure out a way to chunk the data based on the pages
 THE PAGE DATA IS STORED UNDER:
 data-md-component="content"
 
+Below gets the main text from the OWASP documents
+    soup = BeautifulSoup(file,'html.parser')
+        print(soup.find("div", {"class": "md-content"}).get_text())
