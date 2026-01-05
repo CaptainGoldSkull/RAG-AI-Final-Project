@@ -5,15 +5,11 @@ import zipfile
 
 from bs4 import BeautifulSoup
 
-#response = requests.get("https://cheatsheetseries.owasp.org/index.html")
-
-#print(response.text)
-
-owaspBaseLink = "https://cheatsheetseries.owasp.org/bundle.zip"
-linkToParse = "https://cheatsheetseries.owasp.org/News.xml"
-
-parsed = feedparser.parse(linkToParse)
-
+websites = {
+    "owasp":{
+        "link":"https://cheatsheetseries.owasp.org/bundle.zip"
+    }
+}
     
 def deepRemove(Path):
     # Recursive function that will go through a folder and remove all contents
@@ -36,6 +32,7 @@ def deepRemove(Path):
         except:
             print("Couldnt remove directory.. " + filePath)
 
+# Fresh download will only work if the page has a .Zip download.
 def freshDownload(): # Use this for a fresh install/Complete refesh of data
     # Clear out any files in cachedPages
     #if len(os.listdir("cachedPages")) >= 1:
@@ -53,24 +50,21 @@ def freshDownload(): # Use this for a fresh install/Complete refesh of data
     # Cache all the pages from download at:
     # https://cheatsheetseries.owasp.org/bundle.zip    
 
-    requestedData = requests.get(owaspBaseLink)
+    # Added more scalability here
+    for siteName in websites:
+        requestedData = requests.get(websites[siteName]["link"])
 
-    # Store a temporary zip fil;e in /temp
-    with open("temp/owaspDelete.zip",mode="wb") as tempZip:
-        tempZip.write(requestedData.content)
+        # Store a temporary zip file in /temp
+        with open("temp/" + siteName + "Delete.zip",mode="wb") as tempZip:
+            tempZip.write(requestedData.content)
 
-    # decompress into cachedPages/owasp
-    with zipfile.ZipFile("temp/owaspDelete.zip", 'r') as zipRef:
-        zipRef.extractall("cachedPages/owasp")
-        
-    # Remove temp zip
-    os.remove("temp/owaspDelete.zip")
+        # decompress
+        with zipfile.ZipFile("temp/" + siteName + "Delete.zip", 'r') as zipRef:
+            zipRef.extractall("cachedPages/"+siteName)
+            
+        # Remove temp zip
+        os.remove("temp/"+ siteName+"Delete.zip")
 
-    # Next
-    # Go through all the files created and strip them to "barebones"
-    # Essentially just grab data-md-component="content" from the HTML
-    # Then convert it to markdown?
-    # ^ or just do .get_text() for it
 
 
 def checkForUpdates():
