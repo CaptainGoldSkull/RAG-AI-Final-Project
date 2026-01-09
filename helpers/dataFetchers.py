@@ -4,10 +4,11 @@ import os
 import zipfile
 
 from bs4 import BeautifulSoup
+import helpers.textProcessing as helpers 
 
 websites = {
     "owasp":{
-        "link":"https://cheatsheetseries.owasp.org/bundle.zip"
+        "link":"https://cheatsheetseries.owasp.org/bundle.zip",
     }
 }
     
@@ -64,8 +65,6 @@ def freshDownload(): # Use this for a fresh install/Complete refesh of data
             
         # Remove temp zip
         os.remove("temp/"+ siteName+"Delete.zip")
-
-
 
 def checkForUpdates():
     # Check the "last updated" compared to the files last modified for the page for each

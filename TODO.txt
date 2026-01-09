@@ -3,8 +3,8 @@
 Download data from OWASP cheat sheet
 
 ---------TO DO--------------
-Properly ingest the downloaded data
-    | Normalise the text
+Properly ingest the downloaded data - DONE
+    | Normalise the text - DONE
     | Chunk the data into segments that will fit with our tokens
 Call our embedding model, in this case all-MiniLM-L6-v2
 Store in Chroma 
@@ -23,16 +23,18 @@ Update cached html that doesnt match with last Updated
 
 
 Figure out a way to chunk the data based on the pages 
-
-THE PAGE DATA IS STORED UNDER:
-data-md-component="content"
+    | 
+    |
+    |
+    |
+    |
 
 Below gets the main text from the OWASP documents
     soup = BeautifulSoup(file,'html.parser')
         print(soup.find("div", {"class": "md-content"}).get_text())
 
 
-Look into converting HTML into markdown to preserve some layout
+Look into converting HTML into markdown to preserve some layout <-- Unknown if needed
 
 Look into sliding window chunking to preserve context across segments
 Look into using recursive chunking with each page being the main bit
