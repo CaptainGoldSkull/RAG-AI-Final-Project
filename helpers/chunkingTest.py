@@ -3,6 +3,10 @@ from langchain_community.vectorstores import Chroma
 from langchain_text_splitters import MarkdownHeaderTextSplitter, RecursiveCharacterTextSplitter
 from langchain_community.document_loaders import DirectoryLoader, TextLoader
 
+from langchain_groq import ChatGroq
+
+import os
+
 
 dirLoader = DirectoryLoader(
     "processedHtml/",
@@ -23,15 +27,15 @@ chunks = []
 for doc in docs_iter:
     
     docSplit = markdownSplitter.split_text(doc.page_content)
-    print(docSplit)
+    #print(docSplit)
     for split_doc in docSplit:
         split_doc.metadata["source"] = doc.metadata["source"]
     
     chunks.extend(docSplit)
     
+
+    # MOVE EMBEDDINGS AND CHROMA TO ITS OWN SECTION LATER
     embeddings_model = SentenceTransformerEmbeddings(model_name="all-MiniLM-L6-v2")
-
-
     persistent_db_path = "db8"
 
     db_client = Chroma(persist_directory=persistent_db_path, embedding_function=embeddings_model)
@@ -42,23 +46,30 @@ for doc in docs_iter:
         db_client.add_documents(batch)
 
 
+def with_RAG(user_query, k = 5, style = "formal", language= "english"):
+    groqKey = os.getenv("GROQ_API_KEY")
+    if not groqKey:
+        raise RuntimeError("GROQ_API_KEY not set")
+    llm = ChatGroq(api_key=groqKey,model="llama-3.1-8b-instant", temperature=0)
+
+    retrieved_docs = db_client.similarity_search(query=user_query, k=k)
+    retrieved_docs_text = [doc.page_content for doc in retrieved_docs]
+    retrieved_docs_text
+    retrieved_docs_text_str = "\n".join(retrieved_docs_text)
+
+    query_and_context = (
+        "These docs can help you with your questions. If you have no answer, simply say 'I do not know'."
+        f"Question: {user_query}\n"
+        f"Relevant docs: {retrieved_docs_text_str}"
+    )
+
+    messages = [
+        ("system", f"You are an expert assistant providing information strictly based on the context provided to you. Your task is to answer questions or provide information only using the details given in the current context. Do not reference any external knowledge or information not explicitly mentioned in the context. If the context does not contain sufficient information to answer a question, clearly state that the information is not available in the provided context. You should answer in a {style} style and in {language} language."),
+        ("human", query_and_context)
+    ]
+
+    res = llm.invoke(messages)
+    return res.content
 
 
-
-
-print(chunks)
-
-# Use this to set max chunk size when i know what the limits of the model im going to use are.
-chunk_size = 250
-chunk_overlap = 30
-text_splitter = RecursiveCharacterTextSplitter(
-    chunk_size=chunk_size, chunk_overlap=chunk_overlap
-)
-
-# Split
-#splits = text_splitter.split_documents(md_header_splits)
-
-
-
-
-#print(md_header_splits)
+print(with_RAG("What is a security measure that artificial intelligence agents should implement?"))
