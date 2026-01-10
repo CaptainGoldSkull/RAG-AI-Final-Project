@@ -2,7 +2,7 @@ from langchain_community.embeddings.sentence_transformer import SentenceTransfor
 from langchain_community.vectorstores import Chroma
 from langchain_text_splitters import MarkdownHeaderTextSplitter, RecursiveCharacterTextSplitter
 from langchain_community.document_loaders import DirectoryLoader, TextLoader
-
+from dotenv import load_dotenv
 from langchain_groq import ChatGroq
 
 import os
@@ -34,27 +34,33 @@ for doc in docs_iter:
     chunks.extend(docSplit)
     
 
-    # MOVE EMBEDDINGS AND CHROMA TO ITS OWN SECTION LATER
-    embeddings_model = SentenceTransformerEmbeddings(model_name="all-MiniLM-L6-v2")
-    persistent_db_path = "db8"
-
-    db_client = Chroma(persist_directory=persistent_db_path, embedding_function=embeddings_model)
+# MOVE EMBEDDINGS AND CHROMA TO ITS OWN SECTION LATER
     
-    batch_size = 5000 # Using a batch size that is less than the max_batch_size of 5461
-    for i in range(0, len(chunks), batch_size):
-        batch = chunks[i:i + batch_size]
-        db_client.add_documents(batch)
+embeddings_model = SentenceTransformerEmbeddings(model_name="all-MiniLM-L6-v2")
+persistent_db_path = "db8"
+
+db_client = Chroma(persist_directory=persistent_db_path, embedding_function=embeddings_model)
+    
+batch_size = 5000 # Using a batch size that is less than the max_batch_size of 5461
+update_every = 25
+total = len(chunks)
+for i in range(0, total, batch_size):
+    batch = chunks[i:i + batch_size]
+    db_client.add_documents(batch)
+    if i % update_every == 0:
+        print(f"Indexed {i}/{total} chunks")
 
 
 def with_RAG(user_query, k = 5, style = "formal", language= "english"):
+    load_dotenv()
+
     groqKey = os.getenv("GROQ_API_KEY")
     if not groqKey:
         raise RuntimeError("GROQ_API_KEY not set")
-    llm = ChatGroq(api_key=groqKey,model="llama-3.1-8b-instant", temperature=0)
+    llm = ChatGroq(api_key="groqKey",model="llama-3.1-8b-instant", temperature=0)
 
     retrieved_docs = db_client.similarity_search(query=user_query, k=k)
     retrieved_docs_text = [doc.page_content for doc in retrieved_docs]
-    retrieved_docs_text
     retrieved_docs_text_str = "\n".join(retrieved_docs_text)
 
     query_and_context = (
