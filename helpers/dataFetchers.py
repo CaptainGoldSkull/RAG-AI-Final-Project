@@ -1,10 +1,13 @@
 import requests
-import feedparser
 import os
 import zipfile
+#from langchain_community.embeddings.sentence_transformer import SentenceTransformerEmbeddings
+from langchain_huggingface import HuggingFaceEmbeddings
+from langchain_chroma import Chroma
 
-from bs4 import BeautifulSoup
-import helpers.textProcessing as helpers 
+
+#from bs4 import BeautifulSoup
+#import helpers.textProcessing as helpers 
 
 websites = {
     "owasp":{
@@ -72,3 +75,11 @@ def checkForUpdates():
     # Download the data from the provided link
     print("Not meant to run yet")
 
+
+
+def getDBClient():
+    embeddings_model = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
+    persistent_db_path = "db8"
+
+    db_client = Chroma(persist_directory=persistent_db_path, embedding_function=embeddings_model)
+    return db_client

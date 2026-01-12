@@ -1,5 +1,12 @@
 from bs4 import BeautifulSoup
 from html_to_markdown import convert
+
+
+from langchain_text_splitters import MarkdownHeaderTextSplitter, RecursiveCharacterTextSplitter
+from langchain_community.document_loaders import DirectoryLoader, TextLoader
+
+from helpers.dataFetchers import getDBClient
+
 import os
 
 # Functions that can be called on a html file to "Strip" it
@@ -29,3 +36,49 @@ def cleanOwaspFiles():
             # TO DO:
             # Add in "corrupt" data handling i.e check if there are actually files for it to cleanse and re download if there isnt... perhaps something cooler later
             print(f"error finding cachedPages file. Attempt: {runCount} out of {maxRetries}. {maxRetries-runCount} attempts left...  Retrying")
+
+
+def splitPage():
+    dirLoader = DirectoryLoader(
+        "processedHtml/",
+        glob="**.md",
+        loader_cls=TextLoader,
+    )
+
+    headersToSplit = [
+        ("#", "Header 1"),
+        ("##", "Header 2"),
+        ("###", "Header 3"),
+    ]
+    markdownSplitter = MarkdownHeaderTextSplitter(headersToSplit)
+
+    size_splitter = RecursiveCharacterTextSplitter(
+        chunk_size=900,
+        chunk_overlap=120,
+        separators=["\n\n", "\n", " ", ""],
+    )
+
+    docs_iter = dirLoader.lazy_load()
+    chunks = []
+    for doc in docs_iter:
+        
+        docSplit = markdownSplitter.split_text(doc.page_content)
+        #print(docSplit)
+        recursiveSplit = size_splitter.split_documents(docSplit) # This is done as with just markdown split tokens still reach max size occasionally
+        for split_doc in recursiveSplit:
+            split_doc.metadata["source"] = doc.metadata["source"]
+            
+        chunks.extend(recursiveSplit)
+    return chunks
+
+
+def chromaEmbedding(chunksToEmbed):        
+    batch_size = 5000 # Using a batch size that is less than the max_batch_size of 5461
+    update_every = 25
+    total = len(chunksToEmbed)
+    for i in range(0, total, batch_size):
+        batch = chunksToEmbed[i:i + batch_size]
+        getDBClient().add_documents(batch)
+        if i % update_every == 0:
+            print(f"Indexed {i}/{total} chunks")
+
