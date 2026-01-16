@@ -3,6 +3,8 @@ import typer # used for CLI implementation
 
 from helpers.dataFetchers import *
 from helpers.textProcessing import *
+from helpers.embedding import *
+
 from langchain_groq import ChatGroq
 from dotenv import load_dotenv
 
@@ -49,7 +51,7 @@ def main():
         chromaEmbedding(splitPage())
 
 
-    questionToAsk = input("Please give the magical all knowing cyber security god your question. He WILL answer it he has no choice. ")
+    questionToAsk = input(f"Please give the magical all knowing cyber security god your question. He WILL answer it he has no choice. \n")
     print(query(questionToAsk))
 
 

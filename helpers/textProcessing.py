@@ -5,8 +5,6 @@ from html_to_markdown import convert
 from langchain_text_splitters import MarkdownHeaderTextSplitter, RecursiveCharacterTextSplitter
 from langchain_community.document_loaders import DirectoryLoader, TextLoader
 
-from helpers.dataFetchers import getDBClient
-
 import os
 
 # Functions that can be called on a html file to "Strip" it
@@ -72,13 +70,4 @@ def splitPage():
     return chunks
 
 
-def chromaEmbedding(chunksToEmbed):        
-    batch_size = 5000 # Using a batch size that is less than the max_batch_size of 5461
-    update_every = 25
-    total = len(chunksToEmbed)
-    for i in range(0, total, batch_size):
-        batch = chunksToEmbed[i:i + batch_size]
-        getDBClient().add_documents(batch)
-        if i % update_every == 0:
-            print(f"Indexed {i}/{total} chunks")
 

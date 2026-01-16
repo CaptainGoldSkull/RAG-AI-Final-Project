@@ -2,8 +2,7 @@ import requests
 import os
 import zipfile
 #from langchain_community.embeddings.sentence_transformer import SentenceTransformerEmbeddings
-from langchain_huggingface import HuggingFaceEmbeddings
-from langchain_chroma import Chroma
+
 
 
 #from bs4 import BeautifulSoup
@@ -23,7 +22,7 @@ def deepRemove(Path):
             if os.path.isdir(filePath):
                 # Maybe need to add wait for return here...
                 try:
-                    print("Attemtping to remove directory.. "+ filePath)
+                    print("Attempting to remove directory.. "+ filePath)
                     os.rmdir(filePath)
                 except:
                     print("Calling deepRemove on " + filePath)
@@ -77,9 +76,3 @@ def checkForUpdates():
 
 
 
-def getDBClient():
-    embeddings_model = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
-    persistent_db_path = "db8"
-
-    db_client = Chroma(persist_directory=persistent_db_path, embedding_function=embeddings_model)
-    return db_client
