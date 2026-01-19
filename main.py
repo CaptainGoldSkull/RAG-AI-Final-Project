@@ -8,13 +8,12 @@ from helpers.embedding import *
 from langchain_groq import ChatGroq
 from dotenv import load_dotenv
 
+groqKey = os.getenv("GROQ_API_KEY")
+
 def query(user_query, k = 5, style = "formal", language= "english"):
     load_dotenv(dotenv_path=".env", override=True)
 
-    groqKey = os.getenv("GROQ_API_KEY")
-    if not groqKey:
-        raise RuntimeError("GROQ_API_KEY not set")
-    
+       
     llm = ChatGroq(api_key=groqKey,model="llama-3.1-8b-instant", temperature=0)
 
     dbClient = getDBClient()
@@ -29,7 +28,7 @@ def query(user_query, k = 5, style = "formal", language= "english"):
     )
 
     messages = [
-        ("system", f"You are a cyber security research tool. Answer the question is as much detail as possible and provide sources to the document you get the information from. Answer in a {style} tone and in {language}."),
+        ("system", f"You are a cyber security research tool. Answer the question is as much detail as possible and provide sources with links to the document you get the information from. Answer in a {style} tone and in {language}."),
         ("human", query_and_context)
     ]
 
@@ -39,6 +38,9 @@ def query(user_query, k = 5, style = "formal", language= "english"):
 
 
 def main():
+
+    if not groqKey:
+        raise RuntimeError(f'GROQ_API_KEY not set \n Please create a .env file with a value called GROQ_API_KEY \n i.e GROQ_API_KEY="APIKEYHERE", Keys can be made for free here: \n https://console.groq.com/home')
     
     if len(os.listdir("cachedPages")) < 1:
         print("No cached pages... Caching")
@@ -51,7 +53,7 @@ def main():
         chromaEmbedding(splitPage())
 
 
-    questionToAsk = input(f"Please give the magical all knowing cyber security god your question. He WILL answer it he has no choice. \n")
+    questionToAsk = input(f"What is your query for the OWASP database?. \n")
     print(query(questionToAsk))
 
 
