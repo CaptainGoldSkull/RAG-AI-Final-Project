@@ -29,7 +29,7 @@ def query(user_query, k = 5, style = "formal", language= "english"):
     )
 
     messages = [
-        ("system", f"You are a cyber security expert. Answer the question is as much detail as possible and provide sources to the document you get the information from. Answer in a {style} tone and in {language}."),
+        ("system", f"You are a cyber security research tool. Answer the question is as much detail as possible and provide sources to the document you get the information from. Answer in a {style} tone and in {language}."),
         ("human", query_and_context)
     ]
 

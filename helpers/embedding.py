@@ -18,7 +18,6 @@ def getDBClient():
 
     db_client = Chroma(persist_directory=persistent_db_path, embedding_function=embeddings_model)
     return db_client
-# MOVE EMBEDDINGS AND CHROMA TO ITS OWN SECTION LATER
-    
+
 
 
